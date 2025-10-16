@@ -6,9 +6,17 @@
     <title>Document</title>
 </head>
 <body>
-    This is the courses page
     <form action="/details", method="GET">
         <button type="submit">Go back to details</button>
     </form>
+    <br><hr>
+    COURSES PAGE
+    <br><hr>
+
+    <ol>
+    {% for course in courses %}
+        <li><a href="{{ base }}/courses/{{ course['id']}}"> {{ course["name"] }}</a></li>
+    {% endfor %}
+    </ol>
 </body>
 </html>

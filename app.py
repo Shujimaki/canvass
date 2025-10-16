@@ -233,7 +233,9 @@ def profile():
 
 @app.route("/courses", methods=["POST"])
 def courses():
-    return render_template("courses.html")
+    user_courses.clear()
+    load_all_courses(request.path)
+    return render_template("courses.html", courses=user_courses, base=USER_CANVAS_BASE)
 
 @app.route("/assignments", methods=["POST"])
 def assignments():
