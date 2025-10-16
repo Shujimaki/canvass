@@ -201,12 +201,21 @@ def home():
     return render_template("index.html")
 
 
-@app.route("/details", methods=["POST"])
+@app.route("/details", methods=["GET", "POST"])
 def details():
-    session["canvas_url"] = request.form.get("canvas_url").rstrip("/")
-    session["access_token"] = request.form.get("access_token")
-    save_credentials()
+    print (f"request method is {request.method}")
+    if request.method == "POST":
+        session["canvas_url"] = request.form.get("canvas_url").rstrip("/")
+        session["access_token"] = request.form.get("access_token")
+        save_credentials()
+        
+
+    else:
+        print(f"session url = {session["canvas_url"]}")
+        print(session["access_token"])
+    
     user_courses.clear()
+    session
     user_tz = get_user_timezone()
     time = datetime.now(user_tz)
     print(time)
@@ -217,6 +226,17 @@ def details():
     due_asses = get_due_assignments(14)
     return render_template("details.html", base=USER_CANVAS_BASE, profile=profile, courses=user_courses, due_asses=due_asses, time=time)
 
+@app.route("/profile", methods=["POST"])
+def profile():
+    return render_template("profile.html")
+
+@app.route("/courses", methods=["POST"])
+def courses():
+    return render_template("courses.html")
+
+@app.route("/assignments", methods=["POST"])
+def assignments():
+    return render_template("assignments.html")
 
 
 
