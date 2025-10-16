@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        a:link, a:visited {
+            color: blue; /* Or your desired uniform link color */
+        }
+    </style>
+</head>
+<body>
+    <!-- TODO: For every completion of an assignment, get feedback for AI fine tuning -->
+
+    Welcome, {{profile["name"]}}
+    <br>
+    {{ time | format_date }}
+    <br><hr><br>
+
+    {% for day, asses in due_asses.items() %}
+        Due for {{ day.strftime("%B %d, %Y") }}
+        <br>
+        {% if not asses %}
+            None
+            <br><br>
+        {% else %}
+            {% for ass in asses %}
+                {{ass}}
+                <br>
+            {% endfor %}
+            <br>
+        {% endif %}
+    {% endfor %}
+    
+
+    <br><hr><br>
+</body>
+</html>
+
+
