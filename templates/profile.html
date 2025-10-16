@@ -6,9 +6,28 @@
     <title>Document</title>
 </head>
 <body>
-    This is the profile page
     <form action="/details", method="GET">
         <button type="submit">Go back to details</button>
     </form>
+    <br><hr>
+    PROFILE PAGE
+    <br><hr>
+
+    <marquee><img src="{{ profile['avatar_url']}}" height="300" width="300"></marquee>
+    <h2>Name: {{ profile["name"] }}</h2>
+    <h3>Email: {{ profile["primary_email"] }}</h3>
+    <h3>Bio: 
+        {% if not profile['bio'] %}
+            None
+        {% else %}
+            profile['bio']
+        {% endif %}
+    </h3>
+    
+
+
+    
+
+    
 </body>
 </html>

@@ -228,7 +228,8 @@ def details():
 
 @app.route("/profile", methods=["POST"])
 def profile():
-    return render_template("profile.html")
+    profile = get_profile(params = None)
+    return render_template("profile.html", profile=profile)
 
 @app.route("/courses", methods=["POST"])
 def courses():
