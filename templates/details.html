@@ -22,6 +22,7 @@
     form action is for the function, not the route
     -->
 
+
     <form action = "/profile", method = "POST">
         <button type="submit">View Profile</button>
     </form>
@@ -34,19 +35,24 @@
 
 
     <br><hr><br>
-    {% for day, asses in due_asses.items() %}
+
+    {% set url = base + "/course" %}
+
+    {% for day, courses in due_asses.items() %}
         Due for {{ day.strftime("%B %d, %Y") }}
         <br>
-        {% if not asses %}
-            None
-            <br><br>
-        {% else %}
-            {% for ass in asses %}
-                {{ass}}
-                <br>
+
+        {% if courses %}
+            {% for course, asses in courses.items() %}
+                {% for ass in asses %}
+                    {{course}} - {{ass}}
+                    
+                    <br>
+                {% endfor %}
             {% endfor %}
-            <br>
         {% endif %}
+        
+        <br>
     {% endfor %}
     
 

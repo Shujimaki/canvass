@@ -116,9 +116,10 @@ def get_due_assignments(max_days=7):
     for i in range(0, max_days + 1):
         due_date = now.date() + timedelta(days=i)
         print(f"Due for {due_date}")
-        due_asses[due_date] = []
+        due_asses[due_date] = {}
 
         for course in user_courses:
+            due_asses[due_date][course["name"]] = []
 
             for ass in course["assignments"]:
                 due_at_string = ass["due_at"]
@@ -130,7 +131,7 @@ def get_due_assignments(max_days=7):
 
                 if due_at.date() == due_date:
                     print(ass["name"])
-                    due_asses[due_date].append(ass["name"])
+                    due_asses[due_date][course["name"]].append(ass["name"])
     return due_asses
 
 
@@ -224,7 +225,7 @@ def details():
     load_all_courses(request.path)
     load_assignments(request.path)
     due_asses = get_due_assignments(14)
-    return render_template("details.html", base=USER_CANVAS_BASE, profile=profile, courses=user_courses, due_asses=due_asses, time=time)
+    return render_template("details.html", base=COURSE_ENDPOINT_FORMAT, profile=profile, courses=user_courses, due_asses=due_asses, time=time)
 
 @app.route("/profile", methods=["POST"])
 def profile():
@@ -235,7 +236,7 @@ def profile():
 def courses():
     user_courses.clear()
     load_all_courses(request.path)
-    return render_template("courses.html", courses=user_courses, base=USER_CANVAS_BASE)
+    return render_template("courses.html", courses=user_courses, base=USER_ENDPOINT_FORMAT)
 
 @app.route("/assignments", methods=["POST"])
 def assignments():
