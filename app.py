@@ -224,7 +224,7 @@ def details():
     load_all_courses(request.path)
     load_assignments(request.path)
     due_asses = get_due_assignments(14)
-    return render_template("details.html", base=COURSE_EN, profile=profile, courses=user_courses, due_asses=due_asses, time=time)
+    return render_template("details.html", base=COURSE_ENDPOINT_FORMAT, profile=profile, courses=user_courses, due_asses=due_asses, time=time)
 
 @app.route("/profile", methods=["POST"])
 def profile():
