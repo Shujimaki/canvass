@@ -3,7 +3,7 @@ from .models import User
 
 bp = Blueprint("main", __name__)
 
-@app.route("/")
+@bp.route("/")
 def home():
     return render_template("index.html")
 
@@ -11,37 +11,50 @@ def home():
 def details():
     print (f"request method is {request.method}")
     if request.method == "POST":
-        session["canvas_url"] = request.form.get("canvas_url").rstrip("/")
-        session["access_token"] = request.form.get("access_token")
-        save_credentials()
-        
-
-    else:
-        print(f"session url = {session["canvas_url"]}")
-        print(session["access_token"])
+        try:
+            canvas_url = request.form.get("canvas_url")
+            access_token = request.form.get("access_token")
+            user = User(canvas_url, access_token)
+        except Exception:
+            return render_template("index.html")
     
-    user_courses.clear()
-    user_tz = get_user_timezone()
-    time = datetime.now(user_tz)
-    print(time)
-    profile = get_profile(params = None)
-    # also get the courses
-    load_all_courses(request.path)
-    load_assignments(request.path)
+    else:
+        print("User found!")
+    
+    profile = user._get_profile()
+    courses = user._get_courses()
+    assignments = {course.name: [course._get_assignments()] for course in courses}
+    time = datetime.now(ZoneInfo(profile.time_zone))
+
+    # TODO: fix get_due_assignments
     due_asses = get_due_assignments(14)
     return render_template("details.html", base=COURSE_ENDPOINT_FORMAT, profile=profile, courses=user_courses, due_asses=due_asses, time=time)
 
+# TODO: persist user across sessions and routes
 @bp.route("/profile", methods=["POST"])
 def profile():
-    profile = get_profile(params = None)
+    profile = user._get_profile()
     return render_template("profile.html", profile=profile)
 
 @bp.route("/courses", methods=["POST"])
 def courses():
-    user_courses.clear()
-    load_all_courses(request.path)
-    return render_template("courses.html", courses=user_courses, base=USER_ENDPOINT_FORMAT)
+    courses = user._get_courses()
+    return render_template("courses.html", courses=courses, base=USER_ENDPOINT_FORMAT)
 
 @bp.route("/assignments", methods=["POST"])
 def assignments():
+    assignments = user._
     return render_template("assignments.html")
+
+
+@app.route("/set_timezone", methods = ["POST"])
+def set_timezone():
+    data = request.get_json()
+    tz = data.get("timezone")
+
+    if not tz:
+        return jsonify({"success": False, "error": "No timezone provided"}), 400
+    
+    session["timezone"] = tz
+
+    return jsonify({"success": True, "timezone": tz}), 200

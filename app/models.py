@@ -26,17 +26,17 @@ class User:
     def _cache_key(self, *parts):
         return "models:" + ":".join(parts)
 
-    def get_profile(self, timeout=60*60):
+    def _get_profile(self, timeout=60*60):
         key = self._cache_key("profile", self.base_url, self._token_hash())
         cached = cache.get(key)
         if cached is not None:
-            return cached
+            return Profile(self, cached)
 
         data = self._get("/users/self/profile")
         cache.set(key, data, timeout=timeout)
-        return data
+        return Profile(self, data)
 
-    def get_courses(self, timeout=60*60):
+    def _get_courses(self, timeout=60*60):
         key = self._cache_key("courses", self.base_url, self._token_hash())
         cached = cache.get(key)
         if cached is not None:
@@ -47,6 +47,15 @@ class User:
         return [Course(self, c) for c in data]
 
 
+class Profile:
+    def __init__(self, user, data):
+        self.user = user
+        self.name = data["name"]
+        self.avatar = data["avatar_url"]
+        self.email = data["primary_email"]
+        self.time_zone = data["time_zone"]
+
+
 class Course:
     def __init__(self, user, data):
         self.user = user
@@ -55,7 +64,7 @@ class Course:
         self.term = data.get("term", {})
         self.enrollments = data.get("enrollments", [])
 
-    def get_assignments(self, timeout=60*15, params=None):
+    def _get_assignments(self, timeout=60*15, params=None):
         key = self.user._cache_key("assignments", self.user.base_url, str(self.id), self.user._token_hash())
         cached = cache.get(key)
         if cached is not None:
