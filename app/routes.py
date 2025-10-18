@@ -23,7 +23,7 @@ def details():
     
     profile = user._get_profile()
     courses = user._get_courses()
-    assignments = {course.name: [course._get_assignments()] for course in courses}
+    assignments = {course.name: course._get_assignments() for course in courses}
     time = datetime.now(ZoneInfo(profile.time_zone))
 
     # TODO: fix get_due_assignments
