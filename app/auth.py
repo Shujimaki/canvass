@@ -5,7 +5,7 @@ from .extensions import redis_client
 
 class TokenManager:
     @staticmethod
-    def create_token(user, profile, courses, assignments) -> str:
+    def create_token(user, profile, courses) -> str:
         token = uuid.uuid4().hex
 
         user_data = {
@@ -16,18 +16,22 @@ class TokenManager:
                 'avatar': profile.avatar,
                 'email': profile.email,
                 'time_zone': profile.time_zone 
-            }
+            },
             'courses': [{
                 'id': course.id,
                 'name': course.name,
                 'term': course.term,
                 'enrollments': course.enrollments,
-                'assignments': assignments[course.name]
+                'assignments': [{
+                    'id': ass.id,
+                    'name': ass.name,
+                    'due_at': ass.due_at
+                } for ass in course._get_assignments()]
             } for course in courses],
             'created_at': datetime.now().isoformat()
         }
 
-        redist_client.setex(
+        redis_client.setex(
             f'user_token:{token}',
             60 * 60 * 24,
             json.dumps(user_data)
@@ -40,7 +44,7 @@ class TokenManager:
         if not token:
             return None
 
-        data = redis_client.get(f"user_token{token}")
+        data = redis_client.get(f"user_token:{token}")
         if not data:
             return None
         

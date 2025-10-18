@@ -1,5 +1,5 @@
 from flask import Flask
-from .extensions import cache, limiter
+from .extensions import cache, limiter, redis_client
 from .routes import bp as main_bp
 from .filters import register_filters
 

@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+
+{% block nav %}{% endblock %}
+
+{% block content %}
+<h1>Canvas Assistant</h1>
+<form action="/details" method="POST">
+    <div>
+        <label for="canvas_url">Canvas URL:</label>
+        <input type="text" id="canvas_url" name="canvas_url" required>
+    </div>
+    <div>
+        <label for="access_token">Access Token:</label>
+        <input type="password" id="access_token" name="access_token" required>
+    </div>
+    <button type="submit">Login</button>
+</form>
+{% endblock %}

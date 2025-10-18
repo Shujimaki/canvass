@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1>My Courses</h1>
+{% if courses %}
+    <div class="courses">
+    {% for course in courses %}
+        <div class="course">
+            <h2>{{ course.name }}</h2>
+            {% if course.term %}
+                <p>Term: {{ course.term.name }}</p>
+            {% endif %}
+            <p>Enrollment Type: 
+            {% for enrollment in course.enrollments %}
+                {{ enrollment.type }}
+            {% endfor %}
+            </p>
+        </div>
+    {% endfor %}
+    </div>
+{% else %}
+    <p>No active courses found.</p>
+{% endif %}
+{% endblock %}

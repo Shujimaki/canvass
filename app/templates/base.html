@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Canvas Assistant</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            line-height: 1.6;
+        }
+        .nav-buttons {
+            margin: 20px 0;
+        }
+        .nav-buttons form {
+            display: inline-block;
+            margin-right: 10px;
+        }
+        a:link, a:visited {
+            color: blue;
+        }
+    </style>
+</head>
+<body>
+    {% block nav %}
+    <div class="nav-buttons">
+        <form action="/details" method="GET">
+            <button type="submit">Home</button>
+        </form>
+        <form action="/profile" method="POST">
+            <button type="submit">Profile</button>
+        </form>
+        <form action="/courses" method="POST">
+            <button type="submit">Courses</button>
+        </form>
+        <form action="/assignments" method="POST">
+            <button type="submit">Assignments</button>
+        </form>
+    </div>
+    {% endblock %}
+
+    {% block content %}{% endblock %}
+</body>
+</html>

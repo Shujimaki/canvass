@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        a:link, a:visited {
+            color: blue; /* Or your desired uniform link color */
+        }
+    </style>
+</head>
+<body>
+    <!-- TODO: For every completion of an assignment, get feedback for AI fine tuning -->
+
+    {% extends "base.html" %}
+
+    {% block content %}
+    <h1>Welcome, {{profile.name}}</h1>
+    <p>Current time: {{ time | format_date }}</p>
+
+    <h2>Upcoming Assignments</h2>
+    {% if courses %}
+        {% for course in courses %}
+            <h3>{{ course.name }}</h3>
+            {% if course.assignments %}
+                <ul>
+                {% for assignment in course.assignments %}
+                    {% if assignment.due_at %}
+                        <li>{{ assignment.name }} (Due: {{ assignment.due_at|format_date }})</li>
+                    {% endif %}
+                {% endfor %}
+                </ul>
+            {% else %}
+                <p>No assignments due</p>
+            {% endif %}
+        {% endfor %}
+    {% endif %}
+    {% endblock %}
+</body>
+</html>
+
+

@@ -1,5 +1,5 @@
 from flask import Blueprint, render_template, jsonify, request, g, make_response
-from datetime import datetiime
+from datetime import datetime
 from zoneinfo import ZoneInfo
 from .models import User, Profile, Course
 from .auth import TokenManager
@@ -21,9 +21,13 @@ def details():
 
             profile = user._get_profile()
             courses = user._get_courses()
-            assignments = {course.name: course._get_assignments() for course in courses}
+            
+            for course in courses:
+                course.assignments = course._get_assignments()
+            # assignments are fetched when creating token
+            # assignments = {course.name: course._get_assignments() for course in courses}
 
-            token = TokenManager.create_token(user, profile, courses, assignments)
+            token = TokenManager.create_token(user, profile, courses)
 
             resp = make_response(render_template(
                 "details.html",
@@ -87,7 +91,7 @@ def courses():
     if not data:
         return render_template("index.html")
     
-    return render_template("courses.html", courses=data['courses'], base=USER_ENDPOINT_FORMAT)
+    return render_template("courses.html", courses=data['courses'])
 
 @bp.route("/assignments", methods=["POST"])
 def assignments():
@@ -100,12 +104,20 @@ def assignments():
 
     if not data:
         return render_template("index.html")
+
+    assignments_by_course = {
+        course['name']: course['assignments']
+        for course in data['courses']
+    }
     
-    return render_template("assignments.html", assignments={course.name: course._get_assignments() for course in data['courses']})
+    return render_template(
+        "assignments.html", 
+        assignments=assignments_by_course
+        )
 
 
 
-@app.route("/set_timezone", methods = ["POST"])
+@bp.route("/set_timezone", methods = ["POST"])
 def set_timezone():
     data = request.get_json()
     tz = data.get("timezone")

@@ -63,6 +63,7 @@ class Course:
         self.name = data["name"]
         self.term = data.get("term", {})
         self.enrollments = data.get("enrollments", [])
+        self.assignments = data.get("assignments", [])
 
     def _get_assignments(self, timeout=60*15, params=None):
         key = self.user._cache_key("assignments", self.user.base_url, str(self.id), self.user._token_hash())

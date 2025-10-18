@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1>Assignments</h1>
+{% for course_name, course_assignments in assignments.items() %}
+    <div class="course-assignments">
+        <h2>{{ course_name }}</h2>
+        {% if course_assignments %}
+            <ul>
+            {% for assignment in course_assignments %}
+                <li>
+                    {{ assignment.name }}
+                    {% if assignment.due_at %}
+                        <br>Due: {{ assignment.due_at|format_date }}
+                    {% endif %}
+                </li>
+            {% endfor %}
+            </ul>
+        {% else %}
+            <p>No assignments found</p>
+        {% endif %}
+    </div>
+{% endfor %}
+{% endblock %}
