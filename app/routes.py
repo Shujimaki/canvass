@@ -1,5 +1,8 @@
-from flask import Blueprint, render_template, jsonify
-from .models import User
+from flask import Blueprint, render_template, jsonify, request, g, make_response
+from datetime import datetiime
+from zoneinfo import ZoneInfo
+from .models import User, Profile, Course
+from .auth import TokenManager
 
 bp = Blueprint("main", __name__)
 
@@ -15,36 +18,91 @@ def details():
             canvas_url = request.form.get("canvas_url")
             access_token = request.form.get("access_token")
             user = User(canvas_url, access_token)
-        except Exception:
+
+            profile = user._get_profile()
+            courses = user._get_courses()
+            assignments = {course.name: course._get_assignments() for course in courses}
+
+            token = TokenManager.create_token(user, profile, courses, assignments)
+
+            resp = make_response(render_template(
+                "details.html",
+                profile=profile,
+                courses=courses,
+                time=datetime.now(ZoneInfo(profile.time_zone))
+            ))
+            resp.set_cookie('auth_token', token,
+                        max_age=60*60*24*30,
+                        httponly=True, secure=True)
+            return resp
+
+        except Exception as e:
+            print(f"Error: {e}")
             return render_template("index.html")
     
-    else:
-        print("User found!")
+    token = request.cookies.get('auth_token')
+    if not token:
+        print(f"No Token!")
+        return render_template("index.html")
+
+    data = TokenManager.get_user_data(token)
+    if not data:
+        print("No Data!")
+        return render_template("index.html")
     
-    profile = user._get_profile()
-    courses = user._get_courses()
-    assignments = {course.name: course._get_assignments() for course in courses}
-    time = datetime.now(ZoneInfo(profile.time_zone))
+    return render_template(
+        "details.html",
+        profile=data["profile"],
+        courses=data["courses"],
+        time=datetime.now(ZoneInfo(data['profile']['time_zone']))
+    )
 
     # TODO: fix get_due_assignments
-    due_asses = get_due_assignments(14)
-    return render_template("details.html", base=COURSE_ENDPOINT_FORMAT, profile=profile, courses=user_courses, due_asses=due_asses, time=time)
+    # due_asses = get_due_assignments(14)
 
 # TODO: persist user across sessions and routes
 @bp.route("/profile", methods=["POST"])
 def profile():
-    profile = user._get_profile()
-    return render_template("profile.html", profile=profile)
+    token = request.cookies.get('auth_token')
+    if not token:
+        print("No token!")
+        return render_template("index.html")
+
+    data = TokenManager.get_user_data(token)
+
+    if not data:
+        return render_template("index.html")
+    
+    return render_template("profile.html", profile=data['profile'])
 
 @bp.route("/courses", methods=["POST"])
 def courses():
-    courses = user._get_courses()
-    return render_template("courses.html", courses=courses, base=USER_ENDPOINT_FORMAT)
+    token = request.cookies.get('auth_token')
+    if not token:
+        print("No token!")
+        return render_template("index.html")
+
+    data = TokenManager.get_user_data(token)
+
+    if not data:
+        return render_template("index.html")
+    
+    return render_template("courses.html", courses=data['courses'], base=USER_ENDPOINT_FORMAT)
 
 @bp.route("/assignments", methods=["POST"])
 def assignments():
-    assignments = user._
-    return render_template("assignments.html")
+    token = request.cookies.get('auth_token')
+    if not token:
+        print("No token!")
+        return render_template("index.html")
+
+    data = TokenManager.get_user_data(token)
+
+    if not data:
+        return render_template("index.html")
+    
+    return render_template("assignments.html", assignments={course.name: course._get_assignments() for course in data['courses']})
+
 
 
 @app.route("/set_timezone", methods = ["POST"])
