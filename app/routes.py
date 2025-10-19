@@ -29,10 +29,13 @@ def details():
 
             token = TokenManager.create_token(user, profile, courses)
 
+            due_assignments = user.get_due_assignments()
+            
             resp = make_response(render_template(
                 "details.html",
                 profile=profile,
                 courses=courses,
+                due_assignments=due_assignments,
                 time=datetime.now(ZoneInfo(profile.time_zone))
             ))
             resp.set_cookie('auth_token', token,
@@ -53,11 +56,15 @@ def details():
     if not data:
         print("No Data!")
         return render_template("index.html")
+
+    user = User(data['canvas_url'], data['access_token'])
+    due_assignments = user.get_due_assignments()
     
     return render_template(
         "details.html",
         profile=data["profile"],
         courses=data["courses"],
+        due_assignments=due_assignments,
         time=datetime.now(ZoneInfo(data['profile']['time_zone']))
     )
 

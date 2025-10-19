@@ -1,5 +1,7 @@
 import requests
 import hashlib
+from datetime import datetime, timedelta
+from zoneinfo import ZoneInfo
 from app.extensions import cache
 
 # add caching
@@ -46,7 +48,16 @@ class User:
         cache.set(key, data, timeout=timeout)
         return [Course(self, c) for c in data]
 
-    def get_due_assignments(self, max_days = 7):
+    def get_due_assignments(self, max_days=7, timeout=60*10):
+        key = self._cache_key("due_assignments", self.base_url, self._token_hash(), str(max_days))
+        cached = cache.get(key)
+        if cached is not None:
+            return {
+                datetime.fromisoformat(date_str).date(): course_assignments
+                for date_str, course_assignments in cached.items()
+            }
+        
+
         profile = self._get_profile()
         user_tz = ZoneInfo(profile.time_zone)
         now = datetime.now(user_tz)
@@ -70,8 +81,20 @@ class User:
                     if course.name not in due_assignments[due_date]:
                         due_assignments[due_date][course.name] = []
                     
-                    due_assignments[due_date][course.name].append(ass)
+                    assignment_data = {
+                        'id': ass.id,
+                        'name': ass.name,
+                        'due_at': ass.due_at
+                    }
+
+                    due_assignments[due_date][course.name].append(assignment_data)
         
+        cache_data = {
+            date.isoformat(): course_assignments
+            for date, course_assignments in due_assignments.items()
+        }
+        cache.set(key, cache_data, timeout=timeout)
+
         return due_assignments
 
 class Profile:

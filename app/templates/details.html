@@ -21,21 +21,24 @@
     <p>Current time: {{ time | format_date }}</p>
 
     <h2>Upcoming Assignments</h2>
-    {% if courses %}
-        {% for course in courses %}
-            <h3>{{ course.name }}</h3>
-            {% if course.assignments %}
-                <ul>
-                {% for assignment in course.assignments %}
-                    {% if assignment.due_at %}
-                        <li>{{ assignment.name }} (Due: {{ assignment.due_at|format_date }})</li>
-                    {% endif %}
-                {% endfor %}
-                </ul>
-            {% else %}
-                <p>No assignments due</p>
-            {% endif %}
+    {% if due_assignments %}
+        {% for date, courses in due_assignments.items() %}
+            <h3>{{ date | format_date }}</h3>
+            {% for course_name, assignments in courses.items() %}
+                {% if assignments %}
+                    <h4>{{ course_name }}</h4>
+                    <ul>
+                    {% for assignment in assignments %}
+                        <li>{{ assignment.name }}</li>
+                    {% endfor %}
+                    </ul>
+                {% else %}
+                    <h4>None</h4>
+                {% endif %}
+            {% endfor %}
         {% endfor %}
+    {% else %}
+        <p>No upcoming assignments</p>
     {% endif %}
     {% endblock %}
 </body>
