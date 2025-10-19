@@ -46,6 +46,33 @@ class User:
         cache.set(key, data, timeout=timeout)
         return [Course(self, c) for c in data]
 
+    def get_due_assignments(self, max_days = 7):
+        profile = self._get_profile()
+        user_tz = ZoneInfo(profile.time_zone)
+        now = datetime.now(user_tz)
+
+        due_assignments = {}
+        for i in range(max_days + 1):
+            due_date = (now + timedelta(days=i)).date()
+            due_assignments[due_date] = {}
+    
+        courses = self._get_courses()
+        for course in courses:
+            assignments = course._get_assignments()
+
+            for ass in assignments:
+                if not ass.due_at:
+                    continue
+
+                due_date = datetime.fromisoformat(ass.due_at.replace('Z', '+00:00')).astimezone(user_tz).date()
+
+                if now.date() <= due_date <= (now + timedelta(days=max_days)).date():
+                    if course.name not in due_assignments[due_date]:
+                        due_assignments[due_date][course.name] = []
+                    
+                    due_assignments[due_date][course.name].append(ass)
+        
+        return due_assignments
 
 class Profile:
     def __init__(self, user, data):
