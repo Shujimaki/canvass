@@ -3,43 +3,33 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Canvas Assistant</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 20px;
-            line-height: 1.6;
-        }
-        .nav-buttons {
-            margin: 20px 0;
-        }
-        .nav-buttons form {
-            display: inline-block;
-            margin-right: 10px;
-        }
-        a:link, a:visited {
-            color: blue;
-        }
-    </style>
+    <title>Canvass</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
 </head>
 <body>
     {% block nav %}
+    {% set active_page = request.endpoint %}
     <div class="nav-buttons">
-        <form action="/details" method="GET">
-            <button type="submit">Home</button>
-        </form>
-        <form action="/profile" method="POST">
-            <button type="submit">Profile</button>
-        </form>
-        <form action="/courses" method="POST">
-            <button type="submit">Courses</button>
-        </form>
-        <form action="/assignments" method="POST">
-            <button type="submit">Assignments</button>
-        </form>
+        <div class="container">
+            <form action="/details" method="GET">
+                <button type="submit" class="btn {% if active_page == 'main.details' %}active{% endif %}">Home</button>
+            </form>
+            <form action="/profile" method="POST">
+                <button type="submit" class="btn {% if active_page == 'main.profile' %}active{% endif %}">Profile</button>
+            </form>
+            <form action="/courses" method="POST">
+                <button type="submit" class="btn {% if active_page == 'main.courses' %}active{% endif %}">Courses</button>
+            </form>
+            <form action="/assignments" method="POST">
+                <button type="submit" class="btn {% if active_page == 'main.assignments' %}active{% endif %}">Assignments</button>
+            </form>
+        </div>
     </div>
     {% endblock %}
 
-    {% block content %}{% endblock %}
+    <div class="container">
+        {% block content %}{% endblock %}
+    </div>
 </body>
 </html>

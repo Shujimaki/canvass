@@ -1,11 +1,14 @@
 {% extends "base.html" %}
 
 {% block content %}
-<h1>Profile</h1>
-<div class="profile">
-    <img src="{{ profile.avatar }}" alt="Profile picture" width="100">
-    <h2>{{ profile.name }}</h2>
-    <p>Email: {{ profile.email }}</p>
-    <p>Timezone: {{ profile.time_zone }}</p>
+<div class="profile-container">
+    <div class="profile-header">
+        <img src="{{ profile.avatar }}" alt="Profile picture" class="profile-avatar">
+        <div>
+            <h1>{{ profile.name }}</h1>
+            <p>Email: {{ profile.email }}</p>
+            <p>Timezone: {{ profile.time_zone }}</p>
+        </div>
+    </div>
 </div>
 {% endblock %}

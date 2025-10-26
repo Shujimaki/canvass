@@ -3,9 +3,9 @@
 {% block content %}
 <h1>My Courses</h1>
 {% if courses %}
-    <div class="courses">
+    <div class="courses-grid">
     {% for course in courses %}
-        <div class="course">
+        <div class="course-card">
             <h2>{{ course.name }}</h2>
             {% if course.term %}
                 <p>Term: {{ course.term.name }}</p>

@@ -3,16 +3,18 @@
 {% block nav %}{% endblock %}
 
 {% block content %}
-<h1>Canvas Assistant</h1>
-<form action="/details" method="POST">
-    <div>
-        <label for="canvas_url">Canvas URL:</label>
-        <input type="text" id="canvas_url" name="canvas_url" required>
-    </div>
-    <div>
-        <label for="access_token">Access Token:</label>
-        <input type="password" id="access_token" name="access_token" required>
-    </div>
-    <button type="submit">Login</button>
-</form>
+<div class="login-container">
+    <form class="login-form" action="/details" method="POST">
+        <h1>Canvass</h1>
+        <div class="form-group">
+            <label for="canvas_url">Canvas URL:</label>
+            <input type="text" id="canvas_url" name="canvas_url" placeholder="https://www.school.instructure.com" required>
+        </div>
+        <div class="form-group">
+            <label for="access_token">Access Token:</label>
+            <input type="password" id="access_token" name="access_token" placeholder="Enter your access token" required>
+        </div>
+        <button type="submit" class="btn">Login</button>
+    </form>
+</div>
 {% endblock %}

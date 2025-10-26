@@ -17,29 +17,31 @@
     {% extends "base.html" %}
 
     {% block content %}
-    <h1>Welcome, {{profile.name}}</h1>
-    <p>Current time: {{ time | format_date }}</p>
+    <div class="profile-container">
+        <h1>Welcome, {{profile.name}}</h1>
+        <p>Current time: {{ time | format_date }}</p>
 
-    <h2>Upcoming Assignments</h2>
-    {% if due_assignments %}
-        {% for date, courses in due_assignments.items() %}
-            <h3>{{ date | format_date }}</h3>
-            {% for course_name, assignments in courses.items() %}
-                {% if assignments %}
-                    <h4>{{ course_name }}</h4>
-                    <ul>
-                    {% for assignment in assignments %}
-                        <li>{{ assignment.name }}</li>
+        <h2>Upcoming Assignments</h2>
+        {% if due_assignments %}
+            {% for date, courses in due_assignments.items() %}
+                <div class="assignments-list">
+                    <h3>{{ date | format_date }}</h3>
+                    {% for course_name, assignments in courses.items() %}
+                        {% if assignments %}
+                            <h4>{{ course_name }}</h4>
+                            <ul>
+                            {% for assignment in assignments %}
+                                <li>{{ assignment.name }}</li>
+                            {% endfor %}
+                            </ul>
+                        {% endif %}
                     {% endfor %}
-                    </ul>
-                {% else %}
-                    <h4>None</h4>
-                {% endif %}
+                </div>
             {% endfor %}
-        {% endfor %}
-    {% else %}
-        <p>No upcoming assignments</p>
-    {% endif %}
+        {% else %}
+            <p>No upcoming assignments</p>
+        {% endif %}
+    </div>
     {% endblock %}
 </body>
 </html>
