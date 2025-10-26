@@ -116,17 +116,38 @@ class Course:
         self.assignments = data.get("assignments", [])
 
     def _get_assignments(self, timeout=60*15, params=None):
-        key = self.user._cache_key("assignments", self.user.base_url, str(self.id), self.user._token_hash())
+        # include params in the cache key so different query params don't collide
+        params_key = str(params) if params else ""
+        key = self.user._cache_key("assignments", self.user.base_url, str(self.id), self.user._token_hash(), params_key)
         cached = cache.get(key)
         if cached is not None:
             return [Assignment(self, a) for a in cached]
-
+ 
         # include params handling if needed (affects cache key)
         path = f"/courses/{self.id}/assignments"
-        data = self.user._get(path, params=params)
-        cache.set(key, data, timeout=timeout)
-        return [Assignment(self, a) for a in data]
 
+        # Canvas API is paginated. Use the User._get method with page/per_page params
+        # and iterate until no more results.
+        all_data = []
+        page = 1
+        per_page = 100
+        while True:
+            page_params = dict(params) if params else {}
+            page_params.update({"page": page, "per_page": per_page})
+            page_data = self.user._get(path, params=page_params)
+            if not page_data:
+                break
+
+            all_data.extend(page_data)
+
+            # if fewer than per_page results returned, we've reached the last page
+            if len(page_data) < per_page:
+                break
+
+            page += 1
+
+        cache.set(key, all_data, timeout=timeout)
+        return [Assignment(self, a) for a in all_data]
 
 class Assignment:
     def __init__(self, course, data):
